@@ -1,0 +1,9 @@
+{
+  "mode": "first-frame",
+  "prompt": "A presenter stands in the pictured room, looks toward the camera and speaks with a relaxed expression and small natural head movements. <d>[English] Welcome. Let me show you what we made today.</d>\n\noverall_soundscape: Clean close speech and quiet room ambience.\n\nnon_diegetic_music: N/A",
+  "width": 768,
+  "height": 1344,
+  "frames": 124,
+  "seed": 195,
+  "first_frame": "portrait.png"
+}

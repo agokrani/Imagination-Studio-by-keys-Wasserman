@@ -60,3 +60,7 @@ jobs:
         run: |
           export STUDIO_HOME="$RUNNER_TEMP/ImaginationStudio"
           python -m pytest -q tests
+      - name: Modal runner imports and CLI options (no cloud calls)
+        run: |
+          python -m pip install -r modal/requirements.txt
+          python -m modal run modal/h3.py --help

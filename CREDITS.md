@@ -10,6 +10,8 @@ Studio M5 Ultra. Cite the authors first.
 
 ## The studio itself: Keys (drowzeys)
 
+**Modal Labs** provides the Python SDK and hosted CPU/GPU execution used by the optional Modal H3 batch runner.
+
 **Keys (drowzeys)** built this studio: the app and its scripts, the Mac and the DGX Spark builds and the carrier
 image, the TensorFold families for Qwen-Image and MiniMax H3 with their int8 tensor-unit kernels, the native and CUDA
 engines the studio runs (FastH3 on Metal, H3, Drama 3 and MiniMax Music 3 on CUDA, and Music 3 on Metal), and the

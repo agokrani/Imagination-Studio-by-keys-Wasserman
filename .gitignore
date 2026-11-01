@@ -2,4 +2,7 @@ payload/
 outputs/
 __pycache__/
 *.pyc
+.venv/
+/modal/examples/portrait.png
+/modal/examples/voice.wav
 .DS_Store
