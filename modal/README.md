@@ -140,3 +140,9 @@ The batch runner and service share `studio-h3-models` and `studio-h3-outputs` by
 existing installation. Preserve those names when redeploying. Keep outputs and job records until clients have
 reconciled and retained their results; storage cleanup is manual. Modal compute and storage charges belong to
 the selected workspace. See the root licence notices before commercial use; weights are not redistributed.
+
+Service cancellation is an operator action: use `call:<job-id>` in `studio-h3-service-jobs` to cancel the
+Modal call with container termination. Confirm its terminal cancellation before changing the matching
+`job:<job-id>` record to `cancelled`; preserve its other fields and never overwrite a completed job.
+A cancellation request alone is not proof that work stopped. VibeGrow then performs its normal failed-job
+settlement. There is no employee-facing cancellation endpoint.
