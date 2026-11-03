@@ -7,6 +7,16 @@ from h3_support import validate
 MEDIA = re.compile(r"uploads/([a-z0-9]+\.(png|jpg|jpeg|webp|mp4|mov|wav|mp3|m4a|ogg|flac))\Z")
 
 
+def start_render(job, run_id):
+    if job.get("run_id") != run_id:
+        raise ValueError("Render run does not match the accepted job")
+    if job["status"] == "queued":
+        return {**job, "status": "running"}
+    if job["status"] == "running":
+        return {**job, "status": "unknown", "error": "Interrupted render requires operator reconciliation"}
+    return job
+
+
 def video_config(body):
     if not isinstance(body, dict) or set(body) - {"kind", "title", "params"} or body.get("kind") != "video":
         raise ValueError("Only a single video job is supported")

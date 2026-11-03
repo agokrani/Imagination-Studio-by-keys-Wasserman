@@ -26,7 +26,7 @@ or access keys are passed to the rendering subprocess.
 
 The runner creates `studio-h3-models` and `studio-h3-outputs` in the selected environment. Preparation uses CPU
 compute. Rendering requests one B200, falling back to an H200, with 256 GiB host RAM, at most one GPU container
-per app, no automatic retries, and a 24-hour ceiling. Modal compute and storage charges apply. Concurrent
+per app, no application retries, and a 24-hour ceiling. Modal compute and storage charges apply. Concurrent
 preparation and rendering against the same model volume are unsupported; prepare first, then render.
 
 Models are downloaded directly from Comfy Org's MiniMax H3 repository at revision
@@ -126,7 +126,7 @@ qualification before declaring it supported for unattended team use.
 VibeGrow. It does not serve the Studio UI. Every route requires `X-Studio-Key`; ComfyUI stays private.
 Job status and call IDs live in a Modal Dict and files in the output Volume, so restarting the web process
 keeps accepted work. Ambiguous submissions are never automatically repeated. Rendering uses one GPU container,
-no automatic retries and the batch runner's guarded modes and output checks.
+no application retries and the batch runner's guarded modes and output checks.
 
 1. Set `MODAL_PROFILE` explicitly. Prepare the selected mode with the batch command above.
 2. Create a private dotenv file containing `STUDIO_ACCESS_KEY` with a random value of at least 32 characters.
@@ -146,3 +146,9 @@ Modal call with container termination. Confirm its terminal cancellation before 
 `job:<job-id>` record to `cancelled`; preserve its other fields and never overwrite a completed job.
 A cancellation request alone is not proof that work stopped. VibeGrow then performs its normal failed-job
 settlement. There is no employee-facing cancellation endpoint.
+
+Modal can still replay an input after infrastructure preemption, even with `retries=0`. The service never
+reopens a completed, failed or cancelled job on replay. If the previous attempt left no confirmed outcome,
+its status becomes unknown and polling returns HTTP 503 until an operator reconciles it. A failed render
+cannot resume from a sampling step: checkpoints of the denoising state are not implemented. Shorter shots
+can be edited into one video to reduce the work lost to interruption.

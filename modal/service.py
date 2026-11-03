@@ -11,7 +11,7 @@ import uuid
 import modal
 sys.path.insert(0, str(Path(__file__).resolve().parent if modal.is_local() else Path("/opt/studio-modal")))
 import h3
-from service_support import video_config
+from service_support import start_render, video_config
 
 app = modal.App("studio-h3-service")
 jobs = modal.Dict.from_name("studio-h3-service-jobs", create_if_missing=True)
@@ -33,7 +33,11 @@ def prepare(mode: str):
               single_use_containers=True, retries=0)
 def render(job_id: str, config: dict, run_id: str):
     job = jobs["job:" + job_id]
-    jobs["job:" + job_id] = {**job, "status": "running"}
+    started = start_render(job, run_id)
+    jobs["job:" + job_id] = started
+    # Modal replays preempted inputs even with retries=0. Never reopen accepted work on that replay.
+    if job["status"] != "queued":
+        return
     try:
         h3.outputs.reload()
         names = ([config["first_frame"]] if "first_frame" in config else []) + sum(
@@ -42,8 +46,9 @@ def render(job_id: str, config: dict, run_id: str):
         result = h3.render.local(config, files, run_id)
         jobs["job:" + job_id] = {**job, "status": "done", "outputs": [f"renders/{job_id}.mp4"],
                                 "evidence": result}
-    except BaseException:
-        jobs["job:" + job_id] = {**job, "status": "failed", "error": "Render failed; inspect the private Modal logs"}
+    except BaseException as error:
+        message = "Render interrupted by Modal; no automatic rerender was started" if isinstance(error, KeyboardInterrupt) else "Render failed; inspect the private Modal logs"
+        jobs["job:" + job_id] = {**job, "status": "failed", "error": message}
         raise
 
 
@@ -123,6 +128,8 @@ def web():
         job = jobs.get("job:" + job_id)
         if not job:
             raise HTTPException(404, "Job unavailable")
+        if job["status"] == "unknown":
+            raise HTTPException(503, "Interrupted render requires operator reconciliation")
         if job["status"] in {"queued", "running"}:
             call = jobs.get("call:" + job_id)
             if call:

@@ -117,7 +117,7 @@ def render(config: dict, files: dict[str, bytes], run_id: str):
         probe = inspect_output(root / "video.mp4", config)
         result.update(state="completed", probe=probe)
     except BaseException as error:
-        result.update(state="failed", error=str(error))
+        result.update(state="failed", error=str(error) or type(error).__name__)
         raise
     finally:
         try:

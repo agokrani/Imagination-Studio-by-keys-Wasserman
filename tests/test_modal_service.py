@@ -5,7 +5,23 @@ from pathlib import Path
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'modal'))
-from service_support import video_config
+from service_support import start_render, video_config
+
+
+@pytest.mark.parametrize('status', ['done', 'failed', 'cancelled', 'unknown'])
+def test_infrastructure_replay_preserves_terminal_or_unconfirmed_work(status):
+    job = {'id': '1103-120000-abcdef', 'run_id': 'run', 'status': status, 'outputs': ['saved.mp4'], 'error': 'original'}
+    assert start_render(job, 'run') == job
+
+
+def test_only_a_queued_job_starts_and_an_interrupted_attempt_needs_reconciliation():
+    queued = {'run_id': 'run', 'status': 'queued', 'outputs': []}
+    running = start_render(queued, 'run')
+    assert running['status'] == 'running'
+    assert queued['status'] == 'queued'
+    assert start_render(running, 'run')['status'] == 'unknown'
+    with pytest.raises(ValueError):
+        start_render(queued, 'another-run')
 
 
 def request(**params):
