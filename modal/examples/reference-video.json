@@ -1,0 +1,10 @@
+{
+  "mode": "reference",
+  "prompt": "Use <Picture 1> as the presenter, speaking in the low conversational voice of <Audio 1>. The presenter stands in a softly lit room, with relaxed eyes and small natural gestures. <d>[English] Welcome. Let me show you what we made today.</d>\n\noverall_soundscape: Clean close speech and quiet room ambience.\n\nnon_diegetic_music: N/A",
+  "width": 768,
+  "height": 1344,
+  "frames": 124,
+  "seed": 195,
+  "images": ["portrait.png"],
+  "audios": ["voice.wav"]
+}

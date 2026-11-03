@@ -7,7 +7,8 @@
 # Spark the GPU and the system share one pool, and a machine that runs out can become unreachable. The guard looks
 # twenty times a second; it gives the model files' page cache back when little memory is free (the GPU driver takes
 # from what is free, not from what is available) and stops the server when available memory is under
-# SPARK_MEMORY_FLOOR_MB (default: a tenth of the machine, 12.4 GB on a Spark) or is falling there within a second.
+# SPARK_MEMORY_FLOOR_MB (default: a tenth of the machine, 12.4 GB on a Spark), or is near twice that floor and falling
+# there within a second. Cold-load accounting jumps with ample memory do not trigger the rate prediction.
 # Environment: PREFIX, SPARK_COMFY_PORT (8190), SPARK_MEMORY_FLOOR_MB, SPARK_MEMORY_FREE_MB (free memory under which
 # the cache is given back: two thirds of the floor), SPARK_COMFY_ARGS (ComfyUI flags, default --use-ck-attention). TF_H3_CHECK=1 and TF_H3_PROFILE=1 reach TensorFold's H3 node (see its file).
 # SPARK_GOVERNOR names a machine-wide workload governor's folder (spark/workload.py): the server then starts only

@@ -781,7 +781,8 @@ def verdict(samples: list[tuple[float, int]], floor: int, stalled: float = 0.0) 
     before = next(((t, m) for t, m in samples if now - t <= RATE_WINDOW_S), samples[-1])
     if now - before[0] >= RATE_WINDOW_S * 0.6:
         fall = (before[1] - free) / (now - before[0])
-        if fall > 0 and free - fall < floor / 3:
+        # A container's cold-load accounting can jump while ample memory remains.
+        if fall > 0 and free < 2 * floor and free - fall < floor / 3:
             return (f"{free} MB available and falling by {fall:.0f} MB a second, which is under {floor // 3} MB within a second "
                     f"(the floor is {floor} MB)")
     if STALL_SHARE and stalled >= STALL_SHARE and free < 2 * floor:

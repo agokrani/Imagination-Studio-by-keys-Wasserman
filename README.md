@@ -16,6 +16,9 @@ video with sound and Fish Audio Drama 3 voices, on TensorFold: Apple-silicon Mac
 
 ## Minimum hardware requirements (read this first)
 
+For H3 batch rendering on a hosted GPU, see [the Modal setup guide](modal/README.md). It needs a Modal workspace
+and Python locally; the following hardware requirements apply to running the Studio on your own machine.
+
 One machine is a complete Studio: a DGX Spark, an RTX Pro 6000 workstation **or** a Mac. You do not need more than
 one, and none needs another.
 The installers check memory and disk before they download anything and stop with the reason when the machine is

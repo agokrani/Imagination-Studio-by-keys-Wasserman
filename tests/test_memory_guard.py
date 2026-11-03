@@ -128,9 +128,10 @@ def test_when_the_floor_stops_the_server():
     floor = 12454
     assert G.verdict([(0.0, 50000), (0.25, 49000)], floor) == ""
     assert "under the floor" in G.verdict([(0.0, 13000), (0.05, 12400)], floor)
-    # 30 GB available and falling at 30 GB a second is one second from nothing: stopped although far over the floor
-    fast = G.verdict([(0.0, 37500), (0.25, 30000)], floor)
+    # Predict exhaustion near the floor, where the fall is no longer an ample-room cold-load jump.
+    fast = G.verdict([(0.0, 27500), (0.25, 20000)], floor)
     assert "falling by 30000 MB a second" in fast
+    assert G.verdict([(0.0, 100000), (0.25, 50000)], floor) == ""
     # the fastest falls measured while models load (7.2 and 29.5 GB a second) do not stop a server with room: the
     # int8 engine's 13 GB in half a second came at 81 GB available
     assert G.verdict([(0.0, 61800), (0.25, 60000)], floor) == ""
