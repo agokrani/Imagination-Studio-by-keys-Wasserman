@@ -19,11 +19,13 @@ from h3_support import COMFY_COMMIT, MODEL_REVISION, environment, inspect_output
 ROOT = HERE.parent
 MANIFEST = json.loads((HERE / "models.json").read_text())
 app = modal.App("studio-h3-batch")
-weights = modal.Volume.from_name("studio-h3-models", create_if_missing=True)
-outputs = modal.Volume.from_name("studio-h3-outputs", create_if_missing=True)
-download_image = modal.Image.debian_slim(python_version="3.12").uv_pip_install("huggingface-hub==1.33.0")
+weights = modal.Volume.from_name(os.environ.get("STUDIO_MODELS_VOLUME", "studio-h3-models"), create_if_missing=True)
+outputs = modal.Volume.from_name(os.environ.get("STUDIO_OUTPUTS_VOLUME", "studio-h3-outputs"), create_if_missing=True)
+volume_env = {name: os.environ.get(name, default) for name, default in (
+    ("STUDIO_MODELS_VOLUME", "studio-h3-models"), ("STUDIO_OUTPUTS_VOLUME", "studio-h3-outputs"))}
+download_image = modal.Image.debian_slim(python_version="3.12").uv_pip_install("huggingface-hub==1.33.0").env(volume_env)
 image = (
-    modal.Image.from_registry("python:3.12-slim-bookworm")
+    modal.Image.from_registry("python:3.12-slim-bookworm").env(volume_env)
     .apt_install("git", "curl", "ffmpeg", "procps", "libgl1", "libglib2.0-0", "build-essential")
     .run_commands(
         f"git init /opt/studio-runtime/ComfyUI && cd /opt/studio-runtime/ComfyUI && "

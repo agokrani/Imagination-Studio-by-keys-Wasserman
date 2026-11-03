@@ -119,3 +119,24 @@ environment and memory-guard checks. CI also runs these with the full existing s
 These checks do not emulate Modal, a GPU or successful generation. The runtime recipe derives from actual
 Modal H3 experiments; a fresh workspace prepare/render/collect run of this packaged runner still needs live
 qualification before declaring it supported for unattended team use.
+
+## Authenticated HTTP service
+
+`modal/service.py` adds the restricted upload, video submission, polling and completed-file routes used by
+VibeGrow. It does not serve the Studio UI. Every route requires `X-Studio-Key`; ComfyUI stays private.
+Job status and call IDs live in a Modal Dict and files in the output Volume, so restarting the web process
+keeps accepted work. Ambiguous submissions are never automatically repeated. Rendering uses one GPU container,
+no automatic retries and the batch runner's guarded modes and output checks.
+
+1. Set `MODAL_PROFILE` explicitly. Prepare the selected mode with the batch command above.
+2. Create a private dotenv file containing `STUDIO_ACCESS_KEY` with a random value of at least 32 characters.
+   Run `python -m modal secret create studio-h3-service --from-dotenv /secure/path/studio.env`.
+3. Run `python -m modal deploy modal/service.py`. Save the printed HTTPS endpoint.
+4. Check `/health` with the key, then qualify a real render, download and web-process restart before connecting clients.
+   Configure VibeGrow's server-only `STUDIO_CONNECTION` with `url`, `key` and only the qualified `models`.
+
+The batch runner and service share `studio-h3-models` and `studio-h3-outputs` by default. Set
+`STUDIO_MODELS_VOLUME` and `STUDIO_OUTPUTS_VOLUME` consistently during preparation and deployment to reuse an
+existing installation. Preserve those names when redeploying. Keep outputs and job records until clients have
+reconciled and retained their results; storage cleanup is manual. Modal compute and storage charges belong to
+the selected workspace. See the root licence notices before commercial use; weights are not redistributed.
